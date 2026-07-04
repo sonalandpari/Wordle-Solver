@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A professional-grade Wordle solver to help you find the daily puzzle answers using mathematical elimination.">
+  <title>Aura Wordle Solver - Professional Elimination Assistant</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Defer loading of JS scripts so DOM is ready -->
+  <script src="words.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Application Header -->
+    <header class="app-header">
+      <h1 class="app-title" id="main-title">Aura Wordle</h1>
+      <p class="app-subtitle">Ultimate Professional Wordle Solver &amp; Elimination Assistant</p>
+    </header>
+
+    <!-- Step 1: Starter Words Instruction -->
+    <section class="step-card" id="step-1-card">
+      <div class="step-header">
+        <span class="step-badge">STEP 1</span>
+        <h2 class="step-title">Enter Initial Starter Guesses</h2>
+      </div>
+      
+      <p class="starter-words-desc">
+        Click on the letters below to match the feedback from your Wordle puzzle (<strong>Grey</strong> = Absent, <strong>Yellow</strong> = Misplaced, <strong>Green</strong> = Correct). This automatically populates Step 2!
+      </p>
+
+      <div class="starter-words-container">
+        <!-- Crane Row -->
+        <div class="starter-row-wrapper">
+          <div class="starter-row" data-word="crane">
+            <div class="interactive-tile" data-char="c" data-index="0">C</div>
+            <div class="interactive-tile" data-char="r" data-index="1">R</div>
+            <div class="interactive-tile" data-char="a" data-index="2">A</div>
+            <div class="interactive-tile" data-char="n" data-index="3">N</div>
+            <div class="interactive-tile" data-char="e" data-index="4">E</div>
+          </div>
+          <span class="starter-row-desc">Guessed CRANE</span>
+        </div>
+
+        <!-- Thumb Row -->
+        <div class="starter-row-wrapper">
+          <div class="starter-row" data-word="thumb">
+            <div class="interactive-tile" data-char="t" data-index="0">T</div>
+            <div class="interactive-tile" data-char="h" data-index="1">H</div>
+            <div class="interactive-tile" data-char="u" data-index="2">U</div>
+            <div class="interactive-tile" data-char="m" data-index="3">M</div>
+            <div class="interactive-tile" data-char="b" data-index="4">B</div>
+          </div>
+          <span class="starter-row-desc">Guessed THUMB</span>
+        </div>
+
+        <!-- Spoil Row -->
+        <div class="starter-row-wrapper">
+          <div class="starter-row" data-word="spoil">
+            <div class="interactive-tile" data-char="s" data-index="0">S</div>
+            <div class="interactive-tile" data-char="p" data-index="1">P</div>
+            <div class="interactive-tile" data-char="o" data-index="2">O</div>
+            <div class="interactive-tile" data-char="i" data-index="3">I</div>
+            <div class="interactive-tile" data-char="l" data-index="4">L</div>
+          </div>
+          <span class="starter-row-desc">Guessed SPOIL</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 2: Feedbacks and Inputs Grid -->
+    <section class="step-card" id="step-2-card">
+      <div class="step-header">
+        <span class="step-badge">STEP 2</span>
+        <h2 class="step-title">Input Puzzle Feedback</h2>
+      </div>
+
+      <div class="prompt-banner">
+        <span class="prompt-icon">💡</span>
+        <p>
+          You can also type in the grids manually for custom guesses. 
+          Use the <strong>Correct Grid</strong> for green letters, and the <strong>Misplaced Grid</strong> for yellow letters (type multiple letters in a block if multiple guesses had yellow at that slot).
+        </p>
+      </div>
+
+      <form id="solver-form" class="grids-wrapper" onsubmit="return false;">
+        
+        <!-- Correct Grid (Green) -->
+        <div class="grid-section">
+          <div class="grid-label">
+            <span>Correct Placed Grid <span style="color: var(--color-green);">(Green / Exact Match)</span></span>
+            <span class="sub-text">Max 1 letter per block</span>
+          </div>
+          <div class="wordle-grid correct-grid" id="correct-grid">
+            <div class="wordle-cell"><input type="text" maxlength="1" data-index="0" autocomplete="off" spellcheck="false"></div>
+            <div class="wordle-cell"><input type="text" maxlength="1" data-index="1" autocomplete="off" spellcheck="false"></div>
+            <div class="wordle-cell"><input type="text" maxlength="1" data-index="2" autocomplete="off" spellcheck="false"></div>
+            <div class="wordle-cell"><input type="text" maxlength="1" data-index="3" autocomplete="off" spellcheck="false"></div>
+            <div class="wordle-cell"><input type="text" maxlength="1" data-index="4" autocomplete="off" spellcheck="false"></div>
+          </div>
+        </div>
+
+        <!-- Misplaced Grid (Yellow) -->
+        <div class="grid-section">
+          <div class="grid-label">
+            <span>Misplaced Grid <span style="color: var(--color-yellow);">(Yellow / Wrong Position)</span></span>
+            <span class="sub-text">Multiple letters allowed per block</span>
+          </div>
+          <div class="wordle-grid misplaced-grid" id="misplaced-grid">
+            <div class="wordle-cell"><input type="text" placeholder="Letters" data-index="0" autocomplete="off" spellcheck="false"></div>
+            <div class="wordle-cell"><input type="text" placeholder="Letters" data-index="1" autocomplete="off" spellcheck="false"></div>
+            <div class="wordle-cell"><input type="text" placeholder="Letters" data-index="2" autocomplete="off" spellcheck="false"></div>
+            <div class="wordle-cell"><input type="text" placeholder="Letters" data-index="3" autocomplete="off" spellcheck="false"></div>
+            <div class="wordle-cell"><input type="text" placeholder="Letters" data-index="4" autocomplete="off" spellcheck="false"></div>
+          </div>
+        </div>
+
+        <!-- Greyed Out/Excluded Letters -->
+        <div class="grid-section">
+          <div class="grid-label">
+            <span>Greyed Out Letters <span style="color: var(--color-grey-light);">(Excluded / Not in Word)</span></span>
+          </div>
+          <div class="grey-input-container">
+            <span class="grey-badge">Not In Word</span>
+            <input type="text" class="grey-input" id="grey-letters" placeholder="Type all greyed out letters here (e.g. DFGK)" autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+
+        <!-- Virtual Status Keyboard -->
+        <div class="grid-section">
+          <div class="grid-label">
+            <span>Keyboard Status <span class="sub-text">Click keys to toggle letter exclusion</span></span>
+          </div>
+          <div class="virtual-keyboard" id="v-keyboard">
+            <div class="keyboard-row">
+              <button type="button" class="key" data-key="Q">Q</button>
+              <button type="button" class="key" data-key="W">W</button>
+              <button type="button" class="key" data-key="E">E</button>
+              <button type="button" class="key" data-key="R">R</button>
+              <button type="button" class="key" data-key="T">T</button>
+              <button type="button" class="key" data-key="Y">Y</button>
+              <button type="button" class="key" data-key="U">U</button>
+              <button type="button" class="key" data-key="I">I</button>
+              <button type="button" class="key" data-key="O">O</button>
+              <button type="button" class="key" data-key="P">P</button>
+            </div>
+            <div class="keyboard-row">
+              <button type="button" class="key" data-key="A">A</button>
+              <button type="button" class="key" data-key="S">S</button>
+              <button type="button" class="key" data-key="D">D</button>
+              <button type="button" class="key" data-key="F">F</button>
+              <button type="button" class="key" data-key="G">G</button>
+              <button type="button" class="key" data-key="H">H</button>
+              <button type="button" class="key" data-key="J">J</button>
+              <button type="button" class="key" data-key="K">K</button>
+              <button type="button" class="key" data-key="L">L</button>
+            </div>
+            <div class="keyboard-row">
+              <button type="button" class="key" data-key="Z">Z</button>
+              <button type="button" class="key" data-key="X">X</button>
+              <button type="button" class="key" data-key="C">C</button>
+              <button type="button" class="key" data-key="V">V</button>
+              <button type="button" class="key" data-key="B">B</button>
+              <button type="button" class="key" data-key="N">N</button>
+              <button type="button" class="key" data-key="M">M</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Button Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="btn-reset">Reset Solver</button>
+          <button type="submit" class="btn btn-primary" id="btn-solve">
+            <span>🔍 Update Calculations</span>
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- Step 3: Solver Results -->
+    <section class="step-card" id="step-3-card">
+      <div class="step-header">
+        <span class="step-badge">STEP 3</span>
+        <h2 class="step-title">Possible Answers</h2>
+      </div>
+
+      <div class="results-header">
+        <div class="results-count">
+          <span>Found</span>
+          <span class="count-badge" id="results-count-value">2315</span>
+          <span>matching candidates</span>
+        </div>
+        
+        <div class="results-filter-container">
+          <input type="text" class="search-input" id="search-candidates" placeholder="Filter answers by keyword..." autocomplete="off">
+          <select class="sort-select" id="sort-order">
+            <option value="frequency">Sort by Letter Frequency (Recommended)</option>
+            <option value="alpha">Sort Alphabetically</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Letter Statistics Panel -->
+      <div class="stats-section" id="stats-section">
+        <div class="grid-label" style="margin-bottom: 0.5rem; justify-content: space-between;">
+          <span>Letter Distribution <span class="sub-text">(Probability in remaining words)</span></span>
+          <button type="button" id="toggle-stats" style="font-size: 0.8rem; background: none; border: none; color: var(--accent-color); cursor: pointer; text-decoration: underline;">Hide Statistics</button>
+        </div>
+        <div class="stats-grid" id="stats-grid">
+          <!-- Populated dynamically by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Scrollable Container of Suggestions -->
+      <div class="suggestions-grid" id="suggestions-container">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Micro Interaction Toast Notifications -->
+  <div class="toast" id="toast-notification">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message" id="toast-message">Word copied to clipboard!</span>
+  </div>
+
+</body>
+</html>
